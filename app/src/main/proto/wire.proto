@@ -32,6 +32,7 @@ enum MessageType {
     EVENT_AIRPLANE_MODE = 13;
     EVENT_BATTERY = 14;
     EVENT_CONNECTIVITY = 15;
+    EVENT_NETWORK_CONNECTIVITY = 31;
     EVENT_PHONE_STATE = 16;
     EVENT_ROTATION = 17;
     EVENT_BROWSER_PACKAGE = 18;
@@ -47,6 +48,10 @@ message Envelope {
 
 message AirplaneModeEvent {
     required bool enabled = 1;
+}
+
+message NetworkConnectivityEvent {
+    required string ipAddressList = 1;
 }
 
 message BatteryEvent {

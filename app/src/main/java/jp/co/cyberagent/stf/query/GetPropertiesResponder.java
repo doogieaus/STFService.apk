@@ -8,7 +8,10 @@ import android.util.Log;
 import com.google.protobuf.GeneratedMessageLite;
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.net.NetworkInterface;
 
 import jp.co.cyberagent.stf.proto.Wire;
 import jp.co.cyberagent.stf.util.NetworkUtil;
@@ -18,6 +21,26 @@ public class GetPropertiesResponder extends AbstractResponder {
 
     public GetPropertiesResponder(Context context) {
         super(context);
+    }
+
+    public static String getLocalIpAddresses(){
+        String ipAddressList = "";
+        try {
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces();
+                 en.hasMoreElements();) {
+                NetworkInterface networkInterface = en.nextElement();
+                String networkInterfaceName = networkInterface.getName();
+                for (Enumeration<InetAddress> enumIpAddr = networkInterface.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+                    InetAddress inetAddress = enumIpAddr.nextElement();
+                    if (!inetAddress.isLoopbackAddress()) {
+                        ipAddressList += networkInterfaceName + "=" + inetAddress.getHostAddress() + ";";
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            // Don't do anything
+        }
+        return ipAddressList;
     }
 
     @Override
@@ -56,6 +79,9 @@ public class GetPropertiesResponder extends AbstractResponder {
                         break;
                     case "network":
                         value = NetworkUtil.getNetworkType(tm.getNetworkType());
+                        break;
+                    case "ipAddress":
+                        value = GetPropertiesResponder.getLocalIpAddresses();
                         break;
                     default:
                         Log.d(TAG, "unknown property request");
